@@ -20,6 +20,11 @@ class DepartmentView(viewsets.ModelViewSet):
         return CustomUser.objects.filter(department_fk__id=int(pk)).exists()
 
     def destroy(self, request, *args, **kwargs):
+        """
+        overriding defult delete method. only delete item if 
+        the department fk not  found in the CustomUser model
+        """
+
         if not self.is_exist(kwargs["pk"]):
             Departments.objects.get(id=int(kwargs["pk"])).delete()
             return Response({"success": True}, status=status.HTTP_200_OK)

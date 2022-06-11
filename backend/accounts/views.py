@@ -15,16 +15,18 @@ from .generate_jwt import _create_jwt
 from rest_framework import generics
 from permission_class import AdminOnly
 
-# crud of the user custom user model
-
 
 class UserView(viewsets.ModelViewSet):
+    """crud of the user custom user model"""
+
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
     permission_classes = (AdminOnly,)
 
 
 class LoginView(APIView):
+    """login using email or number"""
+    
     def post(self, request):
 
         # find the user
@@ -50,4 +52,3 @@ class LoginView(APIView):
             {"error": "User not found with this given credencails"},
             status=status.HTTP_400_BAD_REQUEST
         )
-

@@ -8,5 +8,5 @@ def save_profile(sender, instance, **kwargs):
     instance.updated_at = datetime.datetime.now()
     instance.save()
 
-
+# 
 post_save.connect(save_profile, sender=CustomUser)

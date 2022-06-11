@@ -13,7 +13,7 @@ import jwt
 from backend.settings import SECRET_KEY
 from .generate_jwt import _create_jwt
 from rest_framework import generics
-from permission_class import FixPermission
+from permission_class import AdminOnly
 
 # crud of the user custom user model
 
@@ -21,7 +21,7 @@ from permission_class import FixPermission
 class UserView(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
-    permission_classes = (FixPermission,)
+    permission_classes = (AdminOnly,)
 
 
 class LoginView(APIView):
@@ -51,11 +51,3 @@ class LoginView(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-
-class GetUser(APIView):
-
-    @is_user_is_authenticated
-    def get(self, request, user):
-        serializer = CustomUserSerializer(user).data
-        del serializer["password"]
-        return Response(serializer, status=status.HTTP_200_OK)

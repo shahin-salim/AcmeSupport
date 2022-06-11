@@ -20,12 +20,14 @@ class TicketView(APIView):
     headers = {'content-type': 'application/json'}
 
     def get_request_url(self, user):
-        ins = UserWithRequestId.objects.get(user_id__id=user.id)
-        print(ins, "===========================")
-        URL = f"/api/v2/users/{ins.request_id}/tickets/requested"
-        if ins.user_id.role == "admin":
-            URL = "api/v2/tickets.json"
-        return self.BASE_URL + URL
+        try:
+            ins = UserWithRequestId.objects.get(user_id__id=user.id)
+            URL = f"/api/v2/users/{ins.request_id}/tickets/requested"
+            if ins.user_id.role == "admin":
+                URL = "api/v2/tickets.json"
+            return self.BASE_URL + URL
+        except:
+            pass
 
     @is_user_is_authenticated
     def get(self, request, user):
@@ -57,16 +59,10 @@ class TicketView(APIView):
         print(request.data["priority"], " *******")
         data = {
             "ticket": {
-                "comment": {
-                    "body":  request.data["description"],
-                },
-                "priority": request.data["priority"],
-                "subject": request.data["subject"],
-                "requester": {
-                    "locale_id": user_ins.id,
-                    "name": user_ins.name,
-                    "email": user_ins.email or user_ins.phone_number
-                },
+                "subject":   request.data["subject"],
+                "comment":   {"body": request.data["description"]},
+                "requester": {"locale_id": 8, "name": user_ins.name, "email": user_ins.email},
+                "priority": request.data["priority"]
             }
         }
 
@@ -87,10 +83,24 @@ class TicketView(APIView):
 
         print(res_json)
 
-        UserWithRequestId.objects.update_or_create(
-            user_id=user_ins,
-            request_id=res_json["ticket"]["requester_id"]
-        )
+        print(res_json["ticket"]["requester_id"]," _+_+_+_")
+
+        try:
+
+            is_in_model = UserWithRequestId.objects.filter(
+                request_id=res_json["ticket"]["requester_id"]
+            ).exists()
+
+            print(is_in_model)
+
+            if not is_in_model:
+                UserWithRequestId.objects.create(
+                    user_id=user_ins,
+                    request_id=res_json["ticket"]["requester_id"]
+                ).exists()
+
+        except:
+            pass
 
         return Response(res_json, status=status.HTTP_200_OK)
 

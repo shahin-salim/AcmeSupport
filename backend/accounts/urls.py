@@ -19,5 +19,4 @@ from .import views
 
 urlpatterns = [
     path('', views.LoginView.as_view(), name='LoginView'),
-    path('get_user', views.GetUser.as_view(), name='get_user'),
 ]

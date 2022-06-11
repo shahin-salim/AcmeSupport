@@ -5,18 +5,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 
-# check user have a valid jwt token
+
+# decode the jwt token
+def decode_jwt(request):
+    token = (request.META["HTTP_AUTHORIZATION"]).split(" ")
+    if token[0] == "Bearer":
+        return jwt.decode(
+            token[1], SECRET_KEY, algorithms=["HS256"]
+        )
 
 
+# check user is autorized check jwt if right return user instace
 def is_user_is_authenticated(fun):
     def inner(self, request):
         try:
-            token = (request.META["HTTP_AUTHORIZATION"]).split(" ")
-            if token[0] == "Bearer":
-                decoded = jwt.decode(
-                    token[1], SECRET_KEY, algorithms=["HS256"]
-                )
-                return fun(self, request, CustomUser.objects.get(id=decoded["userId"]))
+            decoded = decode_jwt(request)
+            return fun(self, request, CustomUser.objects.get(id=decoded["userId"]))
         except:
             pass
 

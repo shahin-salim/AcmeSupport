@@ -7,11 +7,16 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.password_validation import validate_password
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import datetime
 # user model
 
 
 class CustomUser(models.Model):
+    """custom user model"""
+
+
     name = models.CharField(max_length=100)
     email = models.EmailField(
         _('email address'), unique=True, blank=True, null=True)
@@ -32,4 +37,5 @@ class CustomUser(models.Model):
 
     def __str__(self):
         return self.email
+
 
